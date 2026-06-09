@@ -153,6 +153,46 @@ A: 可以！AI 家教会用自己的知识给你讲解。但建议至少放一�
 
 ---
 
+## 👨‍💻 面向计算机专业学生（简洁版）
+
+```bash
+# 1. 克隆仓库
+git clone https://github.com/YHSome/claude-final-exam-review.git
+cd claude-final-exam-review
+
+# 2. 放入讲义（支持 ppt/pptx/pdf/docx/html/md/txt/csv + 图片OCR）
+mkdir 高等数学 && # 把你的课件扔进去
+
+# 3. 可选：安装文档提取依赖
+pip install unstructured
+
+# 4. 启动 Claude Code
+claude
+
+# 在 Claude Code 中：
+/final-exam-review
+我要复习高等数学第八章第四节
+```
+
+**Skill 结构**：
+- `final-exam-review.md` — Skill 定义（Markdown frontmatter + 完整教学流水线）
+- `extract_document.py` — 基于 `unstructured` 库的文档提取，自动识别格式、保留结构、图片 OCR
+- Skill 输出所有教学内容到 `_extracted/科目/章/xxx.讲义.html`（MathJax 渲染），通过本地 HTTP 服务器 `localhost:8888` 在浏览器展示
+- 追加内容（Q&A、练习、答案）用 Edit 工具直接操作 HTML，避免 bash/Python 转义 LaTeX
+
+**技术文档**：
+
+| 文档 | 链接 |
+|:---|:---|
+| Claude Code 官方文档 | https://docs.anthropic.com/en/docs/claude-code |
+| Claude Code Skill 开发指南 | https://docs.anthropic.com/en/docs/claude-code/skills |
+| Skill 最佳实践 | https://docs.anthropic.com/en/docs/claude-code/skills#skill-best-practices |
+| Claude API / Anthropic SDK | https://docs.anthropic.com/en/api |
+| MathJax 3 文档 | https://docs.mathjax.org/en/latest/ |
+| Unstructured 库文档 | https://docs.unstructured.io/ |
+
+---
+
 ## 📄 免责声明
 
 本 Skill 仅供学习辅助。课程讲义版权归原作者所有，请勿将老师的讲义文件上传到公开仓库。
