@@ -146,7 +146,13 @@ python -c "import webbrowser; webbrowser.open('http://localhost:8888/高等数�
 
 **如果服务器已在运行**（端口 8888 被占用）→ 跳过启动，直接用 `http://localhost:8888/...` 打开。
 
-**🚨 防转义铁律**：往 HTML 写入含 LaTeX（`$...$`、`\vec`、`\frac` 等）的内容时，**绝对不要用 `bash python -c "..."`**！bash 会吃掉 `$` 和 `\`。正确做法：用 **Write 工具**先把内容写入 `.py` 文件，再 `python xxx.py` 执行。Write 工具不会做任何转义。
+**🚨 防转义铁律**：往 HTML 追加含 LaTeX（`$...$`、`\vec`、`\frac` 等）的内容时：
+
+| ❌ 禁止 | ✅ 首选 | ✅ 备选 |
+|:---|:---|:---|
+| `bash python -c "..."` — bash 吃掉 `$` 和 `\` | **Edit 工具**直接往 HTML 的 `</body>` 前插入内容 — 零转义，最可靠 | Write 工具写 `.py` 文件再 `python` 执行 |
+
+**为什么 Edit 工具最佳**：Edit 的内容原封不动写入文件，不经过 bash、不经过 Python 字符串解析，`\vec` 就是 `\vec`，`$x$` 就是 `$x$`。
 
 ### 第二步点五：公式补全（理科必做，在讲解之前）
 
