@@ -1,8 +1,10 @@
 # 课程原始资料（版权+体积大）
 高等数学/
 
-# 提取缓存
-_extracted/
+# 提取缓存（忽略内容但保留 package.json 用于 MathJax 安装）
+_extracted/*
+!_extracted/package.json
+!_extracted/package-lock.json
 
 # Python
 __pycache__/

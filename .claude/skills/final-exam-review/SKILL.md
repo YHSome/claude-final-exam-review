@@ -197,24 +197,49 @@ pip install unstructured
 
 **提取后先做内容判断**：根据概览识别这是讲义PPT、教材还是笔记，标注各章节覆盖是否完整。如果某章节资料缺失或太简略，明确告诉学生"这一章的资料不足以做详细讲解，我只能基于现有内容帮你梳理框架"。
 
-### 第二步〇：启动本地 HTTP 服务器（首次必做）
+### 第二步〇：启动本地 HTTP 服务器（AI 自动执行，首次必做）
 
 **🚨 绝对不要用 `start "" "file:///..."` 打开 HTML！** `file://` 协议下浏览器会阻止 MathJax CDN 加载，公式无法渲染。
 
-**必须先启动本地 HTTP 服务器**（以 `_extracted/` 为根目录），然后用 `http://localhost:8888/...` 访问：
+**AI 自动启动服务器流程（无需学生手动操作）：**
 
-```bash
-# 启动服务器（后台运行，只需启动一次）
-python -m http.server 8888 -d "C:\Users\YHSome\Desktop\期末复习\_extracted"
+```
+第0步：确保 MathJax 已安装（本地渲染，不走外网 CDN）
+第1步：检测端口 8888 是否已被占用
+第2步：若未占用 → 后台启动 python -m http.server 8888（run_in_background: true）
+第3步：若已占用 → 跳过启动，直接用 http://localhost:8888/...
 ```
 
-**打开文件时**，用 `http://localhost:8888/` + 相对路径（中文需 URL 编码）：
+**具体执行：**
 
 ```bash
-python -c "import webbrowser; webbrowser.open('http://localhost:8888/高等数学/H-第八章%20空间解析几何与向量代数/8-4%20平面及其方程.讲义.html')"
+# 第0步：安装 MathJax（如果还没有）
+# 检测 _extracted/node_modules/mathjax/es5/tex-svg.js 是否存在
+ls _extracted/node_modules/mathjax/es5/tex-svg.js 2>/dev/null || npm install --prefix _extracted/
+
+# 第1步：检测端口（静默检测，不报错）
+python -c "import socket; s=socket.socket(); s.settimeout(1); r=s.connect_ex(('localhost',8888)); s.close(); exit(r)" 2>/dev/null
+# 退出码 0 = 端口已被占用（已有服务器在跑）→ 跳过启动
+# 退出码 1 = 端口空闲 → 需要启动
 ```
 
-**如果服务器已在运行**（端口 8888 被占用）→ 跳过启动，直接用 `http://localhost:8888/...` 打开。
+**第2步：如果端口空闲，AI 用 `run_in_background: true` 启动：**
+
+```bash
+# description: 启动本地HTTP服务器用于MathJax渲染
+# run_in_background: true
+python -m http.server 8888 -d "<项目根目录>/_extracted"
+```
+
+**打开讲义文件：**用 `python -c "import webbrowser; ..."` 通过 HTTP 协议打开，中文路径需 URL 编码：
+
+```bash
+python -c "import webbrowser; webbrowser.open('http://localhost:8888/高等数学/J-第十章%20重积分/10-5%20三重积分及其在直角坐标系下的计算.讲义.html')"
+```
+
+**备选方案（学生手动启动）：**双击 `.claude/skills/final-exam-review/start-server.cmd`
+
+---
 
 **🚨 防转义铁律**：往 HTML 追加含 LaTeX（`$...$`、`\vec`、`\frac` 等）的内容时：
 
@@ -504,7 +529,7 @@ PPT/PDF 中的数学公式通常是嵌入式对象，提取工具无法获取。
 <script>
 MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']],displayMath:[['$$','$$'],['\\[','\\]']]},svg:{fontCache:'global'}};
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script async src="/node_modules/mathjax/es5/tex-svg.js"></script>
 <style>
 body{max-width:900px;margin:40px auto;padding:0 20px;font:18px/1.8 -apple-system,"Microsoft YaHei",sans-serif;color:#222;background:#fff}
 h1{font-size:28px;border-bottom:3px solid #2563eb;padding-bottom:12px;margin:40px 0 24px}
